@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Loading from './Loading';
+
 const MovieDetail = () => {
   const { imdbID } = useParams(); 
   const [movieDetail, setMovieDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [similarMovies, setSimilarMovies] = useState([]);
+  const [error, setError] = useState(null); // State for handling errors
   const API_KEY = '4c168bd1';
 
   const fetchMovieDetail = async () => {
     setLoading(true);
+    setError(null); // Reset error state before each fetch
     try {
       const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}&plot=full`
+        `https://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}&plot=full`
       );
 
       if (!response.ok) {
@@ -28,6 +31,7 @@ const MovieDetail = () => {
         console.error('Movie details not found');
       }
     } catch (error) {
+      setError(error.message);
       console.error('Error fetching movie details:', error.message);
     } finally {
       setLoading(false);
@@ -37,7 +41,7 @@ const MovieDetail = () => {
   const fetchSimilarMovies = async (genre) => {
     try {
       const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${API_KEY}&s=${genre}&type=movie`
+        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${genre}&type=movie`
       );
 
       if (!response.ok) {
@@ -58,7 +62,11 @@ const MovieDetail = () => {
   }, [imdbID]);
 
   if (loading) {
-    return <div><Loading/></div>;
+    return <div><Loading /></div>;
+  }
+
+  if (error) {
+    return <div className="alert alert-danger">Something went wrong. Please try again later.</div>;
   }
 
   if (!movieDetail) {
@@ -99,14 +107,14 @@ const MovieDetail = () => {
           <h5>Rating:</h5>
           <p>{movieDetail.imdbRating}</p>
 
-         
           {movieDetail.Trailer && (
             <div className="mt-4">
               <h5>Watch Trailer:</h5>
+              {/* Check if trailer is a YouTube link before embedding */}
               <iframe
                 width="560"
                 height="315"
-                src={movieDetail.Trailer}
+                src={movieDetail.Trailer} // Ensure this is a valid YouTube URL
                 title="YouTube video player"
                 frameBorder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -131,7 +139,6 @@ const MovieDetail = () => {
                 <div className="card-body">
                   <h5 className="card-title">{movie.Title}</h5>
                   <p className="card-text">Year: {movie.Year}</p>
-                 
                   <Link to={`/movie/${movie.imdbID}`} className="btn btn-primary">
                     View Details
                   </Link>
