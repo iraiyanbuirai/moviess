@@ -17,14 +17,13 @@ const Dashboard = () => {
 
   const API_KEY = "4c168bd1";
 
-  
   const fetchMovies = async () => {
     if (!hasMore) return;
 
     setLoading(true);
     try {
       const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${API_KEY}&s=movie&page=${page}`
+        `https://www.omdbapi.com/?apikey=${API_KEY}&s=movie&page=${page}`
       );
 
       if (!response.ok) {
@@ -48,11 +47,9 @@ const Dashboard = () => {
     }
   };
 
-  
   useEffect(() => {
     fetchMovies();
   }, [page]);
-
 
   const handleScroll = () => {
     if (
@@ -70,14 +67,13 @@ const Dashboard = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [loading, hasMore]);
 
-
   const handleSearch = async (query) => {
     if (!query) return;
 
     setLoading(true);
     try {
       const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
       );
 
       if (!response.ok) {
