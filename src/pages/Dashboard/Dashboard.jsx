@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { removeSessionCookie } from "../../utils/auth";
 import { setUser } from "../../redux/store";
 import MovieCard from "../../components/MovieCard";
-import SearchBar from "../../components/SearchBar";
+import SearchBar from "../../components/Searchbar";
 import Loading from "../../components/Loading";
 
 const Dashboard = () => {
