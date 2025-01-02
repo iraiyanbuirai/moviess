@@ -102,13 +102,13 @@ const Dashboard = () => {
     removeSessionCookie();
     dispatch(setUser(null));
     localStorage.removeItem("user_token"); 
-    navigate("/login"); 
+    navigate("/"); 
   };
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1 className="text-center">Movies Dashboard</h1>
+        <h1 className="text-center">Movieszzz </h1>
         <button className="btn btn-danger" onClick={handleLogout}>
           Logout
         </button>
