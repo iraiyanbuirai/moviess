@@ -19,7 +19,7 @@ const SignUp = () => {
 
     setLoading(false);
     alert("Sign-up successful!");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
