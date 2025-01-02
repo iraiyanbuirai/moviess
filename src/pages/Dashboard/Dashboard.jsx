@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { removeSessionCookie } from "../../utils/auth";
@@ -11,20 +11,22 @@ const Dashboard = () => {
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true); 
+  const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const API_KEY = "4c168bd1";
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (query = "") => {
     if (!hasMore) return;
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=movie&page=${page}`
-      );
+      const url = query
+        ? `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}&page=${page}`
+        : `https://www.omdbapi.com/?apikey=${API_KEY}&s=movie&page=${page}`;
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -34,7 +36,7 @@ const Dashboard = () => {
       console.log("Fetched Movies:", data);
 
       if (data.Search && Array.isArray(data.Search)) {
-        setMovies((prevMovies) => [...prevMovies, ...data.Search]);
+        setMovies((prevMovies) => (page === 1 ? data.Search : [...prevMovies, ...data.Search]));
         if (data.Search.length < 10) setHasMore(false);
       } else {
         console.error("Unexpected response structure:", data);
@@ -70,45 +72,22 @@ const Dashboard = () => {
   const handleSearch = async (query) => {
     if (!query) return;
 
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Search Results:", data);
-
-      if (data.Search && Array.isArray(data.Search)) {
-        setMovies(data.Search);
-        setPage(1);
-        setHasMore(true); 
-      } else {
-        setMovies([]);
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error("Error during search:", error.message);
-    } finally {
-      setLoading(false);
-    }
+    setPage(1); // Reset to first page for new search results
+    setHasMore(true); // Allow more results
+    fetchMovies(query);
   };
 
   const handleLogout = () => {
     removeSessionCookie();
     dispatch(setUser(null));
-    localStorage.removeItem("user_token"); 
-    navigate("/"); 
+    localStorage.removeItem("user_token");
+    navigate("/");
   };
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1 className="text-center">Movieszzz </h1>
+        <h1 className="text-center">Movieszzz</h1>
         <button className="btn btn-danger" onClick={handleLogout}>
           Logout
         </button>
@@ -124,7 +103,7 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-      {loading && <div><Loading/></div>}
+      {loading && <div><Loading /></div>}
       {!hasMore && !loading && <p className="text-center mt-4">No more movies!</p>}
     </div>
   );
